@@ -131,3 +131,52 @@ class Command(BaseCommand):
             default=False,
             help='Загружать все таблицы.'
         )
+        parser.add_argument(
+            '-ca',
+            '--category',
+            action='store_true',
+            default=False,
+            help='Загружать категории'
+        )
+        parser.add_argument(
+            '-g',
+            '--genre',
+            action='store_true',
+            default=False,
+            help='Загружать жанры'
+        )
+        parser.add_argument(
+            '-t',
+            '--titles',
+            action='store_true',
+            default=False,
+            help='Загружать произведения'
+        )
+        parser.add_argument(
+            '-r',
+            '--review',
+            action='store_true',
+            default=False,
+            help='Загружать рецензии'
+        )
+        parser.add_argument(
+            '-co',
+            '--comments',
+            action='store_true',
+            default=False,
+            help='Загружать коментарии'
+        )
+        parser.add_argument(
+            '-u',
+            '--users',
+            action='store_true',
+            default=False,
+            help='Загружать пользователей'
+        )
+        parser.add_argument(
+            '-gt',
+            '--genre_title',
+            action='store_true',
+            default=False,
+            help='Загружать связь произведений и категорий'
+        )
