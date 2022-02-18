@@ -77,12 +77,6 @@ class GenreTitle(models.Model):
     )
 
 
-class GenreTitle(models.Model):
-    """Модель для связи произведений и жанров отношением многие ко многим."""
-    title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
-
-
 # Это модели, сделанные Хайрулло, мне нравятся, но решать тем,
 # кто с ними будет работать. Оставил тут для возможности посмотреть.
 # ================================================================
