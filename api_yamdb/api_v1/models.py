@@ -25,15 +25,28 @@ class User(AbstractUser):
 
 class Genre(models.Model):
     """Модель жанров."""
-    name = models.CharField(max_length=255)
+    name = models.TextField(verbose_name='Название жанра')
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
 
 
 class Category(models.Model):
     """Модель категорий."""
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    name = models.TextField(max_length=256, verbose_name='Название категории')
+    slug = models.SlugField(max_length=50, unique=True)
 
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.name
 
 class Title(models.Model):
     """Модель произведений."""
