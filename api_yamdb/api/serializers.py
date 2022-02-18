@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api_v1.models import Category, Genre, User
+from .models import Category, Genre, User
 
 
 class CategorySerializer(serializers.ModelSerializer):

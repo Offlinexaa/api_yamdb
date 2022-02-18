@@ -5,8 +5,8 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 # Заменить api_v1 на имя приложения
-from api_v1.models import (Genre, Category, Title, GenreTitle, Review,
-                           Comment, User)
+from api.models import (Genre, Category, Title, GenreTitle, Review,
+                        Comment, User)
 
 
 def _get_file_reader(filename):
