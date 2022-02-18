@@ -6,6 +6,12 @@ from django.db import models
 # Сделан для обкатки скипта импорта данных, но можно пользовать
 # и дальше.
 class User(AbstractUser):
+    USER_ROLES = [
+        ('user', 'user'),
+        ('moderator', 'moderator'),
+        ('admin', 'admin')
+    ]
+
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -13,6 +19,7 @@ class User(AbstractUser):
     role = models.CharField(
         'Роль',
         max_length=255,
+        choices=USER_ROLES,
     )
 
 
