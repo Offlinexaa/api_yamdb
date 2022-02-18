@@ -5,7 +5,7 @@ from .models import Category, Genre, User
 from .permissions import AdminOnly
 from .mixins import (CreateByAdminOrReadOnlyModelMixin)
 from .serializers import (CategorySerializer, GenreSerializer,
-                         UserSerializer)
+                          UserSerializer)
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
