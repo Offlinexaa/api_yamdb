@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from .validators import validate_year
 
 
 # Это только скелет базы. Требует уточнений и правок.
@@ -43,13 +44,24 @@ class Category(models.Model):
 
 class Title(models.Model):
     """Модель произведений."""
-    name = models.CharField(max_length=255)
-    year = models.DateField()
+    name = models.CharField(max_length=255, verbose_name='Название произведения')
+    year = models.DateField(verbose_name='Год выпуска', validators=[validate_year])
+    description = models.TextField(max_length=255, verbose_name='Описание')
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
         related_name='title',
     )
+    genre = models.ManyToManyField(Genre,
+                                   through='GenreTitle',
+                                   verbose_name='Жанр')
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+
+    def __str__(self):
+        return self.name
 
 
 class GenreTitle(models.Model):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Category, Genre
+from .models import Category, Genre, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -15,3 +15,10 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Title
+        fields = '__all__'

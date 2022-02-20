@@ -1,6 +1,6 @@
-from .models import Category, Genre
-from .mixins import (CreateByAdminOrReadOnlyModelMixin)
-from .serializers import (CategorySerializer, GenreSerializer)
+from .models import Category, Genre, Title
+from .mixins import CreateByAdminOrReadOnlyModelMixin, CreateOrChangeByAdminOrReadOnlyModelMixin
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -13,3 +13,8 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     serializer_class = GenreSerializer
     search_fields = ('name',)
     queryset = Genre.objects.all()
+ 
+
+class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
