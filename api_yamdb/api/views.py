@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 
-from .models import Category, Genre, User, Title
+from reviews.models import Category, Genre, User, Title
 from .permissions import AdminOnly
 from .mixins import (CreateByAdminOrReadOnlyModelMixin,
                      CreateOrChangeByAdminOrReadOnlyModelMixin,
