@@ -5,7 +5,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 # Заменить api_v1 на имя приложения
-from api.models import (Genre, Category, Title, GenreTitle, Review,
+from reviews.models import (Genre, Category, Title, GenreTitle, Review,
                         Comment, User)
 
 
@@ -46,8 +46,8 @@ def _load_genre_title():
     for line in reader[1:]:
         _, created = GenreTitle.objects.get_or_create(
             pk=int(line[0]),
-            title_id=Title.objects.get(pk=int(line[1])),
-            genre_id=Genre.objects.get(pk=int(line[2]))
+            title=Title.objects.get(pk=int(line[1])),
+            genre=Genre.objects.get(pk=int(line[2]))
         )
 
 
