@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 
-app_name = 'api_v1'
+app_name = 'api'
 
 router = DefaultRouter()
 router.register('categories', views.CategoryViewSet,
@@ -14,4 +14,4 @@ router.register('titles', views.TitleViewSet,
                 basename='titles api endpoint')
 
 
-urlpatterns = [ path('v1/', include(router.urls)),]
+urlpatterns = [path('v1/', include(router.urls)), ]
