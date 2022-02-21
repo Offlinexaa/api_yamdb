@@ -5,8 +5,8 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 # Заменить api_v1 на имя приложения
-from api_v1.models import (Genre, Category, Title, GenreTitle, Review,
-                           Comment, User)
+from api.models import (Genre, Category, Title, GenreTitle, Review,
+                        Comment, User)
 
 
 def _get_file_reader(filename):
@@ -69,7 +69,7 @@ def _load_reviews():
     for line in reader[1:]:
         _, created = Review.objects.get_or_create(
             pk=int(line[0]),
-            title_id=Title.objects.get(pk=int(line[1])),
+            title=Title.objects.get(pk=int(line[1])),
             text=line[2],
             author=User.objects.get(pk=int(line[3])),
             score=int(line[4]),
@@ -83,7 +83,7 @@ def _load_comments():
     for line in reader[1:]:
         _, created = Comment.objects.get_or_create(
             pk=int(line[0]),
-            review_id=Review.objects.get(pk=int(line[1])),
+            review=Review.objects.get(pk=int(line[1])),
             text=line[2],
             author=User.objects.get(pk=int(line[3])),
             pub_date=datetime.strptime(line[4], '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -119,7 +119,21 @@ class Command(BaseCommand):
             loaders.append(_load_reviews)
             loaders.append(_load_comments)
         else:
-            pass
+            if options['category']:
+                loaders.append(_load_category)
+            if options['genre']:
+                loaders.append(_load_genre)
+            if options['titles']:
+                loaders.append(_load_titles)
+            if options['review']:
+                loaders.append(_load_reviews)
+            if options['comments']:
+                loaders.append(_load_comments)
+            if options['users']:
+                loaders.append(_load_users)
+            if options['genre_title']:
+                loaders.append(_load_genre_title)
+
         for loader in loaders:
             loader()
 

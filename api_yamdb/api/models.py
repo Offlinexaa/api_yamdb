@@ -1,12 +1,26 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from .validators import validate_year
 
+# from .validators import validate_year
 
-# Это только скелет базы. Требует уточнений и правок.
-# Сделан для обкатки скипта импорта данных, но можно пользовать
-# и дальше.
+MAX_SCORE = 'Максимальная оценка'
+MIN_SCORE = 'Минимальная оценка'
+
+
 class User(AbstractUser):
+    """
+    Модель пользователя.
+    Добавлены поля 'Биография', 'Роль' и 'Код подтверждения'.
+    """
+    USER_ROLES = [
+        ('user', 'user'),
+        ('moderator', 'moderator'),
+        ('admin', 'admin')
+    ]
+
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -14,7 +28,19 @@ class User(AbstractUser):
     role = models.CharField(
         'Роль',
         max_length=255,
+        choices=USER_ROLES,
+        default='user'
     )
+    confirmation_code = models.TextField(
+        'Код подтверждения',
+        null=True,
+        blank=True,
+    )
+
+    class Meta():
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
 
 
 class Genre(models.Model):
@@ -42,10 +68,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Title(models.Model):
     """Модель произведений."""
-    name = models.CharField(max_length=255, verbose_name='Название произведения')
-    year = models.DateField(verbose_name='Год выпуска', validators=[validate_year])
+    name = models.CharField(max_length=255,
+                            verbose_name='Название произведения')
+    year = models.DateField(verbose_name='Год выпуска',
+                            validators=[validate_year])
     description = models.TextField(max_length=255, verbose_name='Описание')
     category = models.ForeignKey(
         Category,
@@ -79,33 +108,64 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
-    """Модель рецензии."""
-    title_id = models.ForeignKey(
+    """Модель Произведение"""
+    title = models.ForeignKey(
         Title,
+        verbose_name='Произведение',
         on_delete=models.CASCADE,
-        related_name='review',
+        related_name='reviews',
     )
-    text = models.TextField()
+    text = models.TextField('Текст отзыва')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='review'
+        related_name='reviews'
     )
-    score = models.IntegerField()
-    pub_date = models.DateTimeField()
+    score = models.IntegerField(
+        'Оценка',
+        default=5,
+        validators=(
+            MaxValueValidator(10, message=MAX_SCORE),
+            MinValueValidator(1, message=MIN_SCORE)
+        )
+    )
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ('-pub_date',)
+        constraints = (
+            models.UniqueConstraint(
+                fields=('title', 'author',),
+                name='one_review'
+            ),
+        )
 
 
 class Comment(models.Model):
-    """Модель коментария к рецензии."""
-    review_id = models.ForeignKey(
+    """Модель Отзыва"""
+    review = models.ForeignKey(
         Review,
+        verbose_name='Отзыв',
         on_delete=models.CASCADE,
-        related_name='comment',
+        related_name='comments',
     )
-    text = models.TextField()
+    text = models.TextField('Текст комментария')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='comment',
+        related_name='comments'
     )
-    pub_date = models.DateTimeField()
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ('-pub_date',)
