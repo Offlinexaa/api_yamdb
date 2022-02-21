@@ -43,7 +43,7 @@ class AdminOnly(permissions.BasePermission):
     """Пермишен доступа только для админа."""
     def has_permission(self, request, view):
         return (request.user.role.lower() == 'admin'
-                or request.user.is_superuse)
+                or request.user.is_superuser)
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)
