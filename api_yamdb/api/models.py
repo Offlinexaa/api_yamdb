@@ -9,6 +9,10 @@ MIN_SCORE = 'Минимальная оценка'
 
 
 class User(AbstractUser):
+    """
+    Модель пользователя.
+    Добавлены поля 'Биография', 'Роль' и 'Код подтверждения'.
+    """
     USER_ROLES = [
         ('user', 'user'),
         ('moderator', 'moderator'),
@@ -23,7 +27,18 @@ class User(AbstractUser):
         'Роль',
         max_length=255,
         choices=USER_ROLES,
+        default='user'
     )
+    confirmation_code = models.TextField(
+        'Код подтверждения',
+        null=True,
+        blank=True,
+    )
+
+    class Meta():
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
 
 
 class Genre(models.Model):
