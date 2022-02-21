@@ -11,5 +11,13 @@ class CreateByAdminOrReadOnlyModelMixin(mixins.CreateModelMixin,
     permission_classes = (AdminOrReadonly)
 
 
+class CreateOrChangeByAdminOrReadOnlyModelMixin(mixins.CreateModelMixin,
+                                                mixins.ListModelMixin,
+                                                mixins.DestroyModelMixin,
+                                                mixins.UpdateModelMixin,
+                                                viewsets.GenericViewSet):
+    permission_classes = AdminOrReadonly
+
+
 class PostByAny(mixins.CreateModelMixin, generics.GenericAPIView):
     permission_classes = (AllowAny, )

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
-from .models import Category, Genre, User
+from .models import Category, Genre, Title, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -16,6 +16,13 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
+
+
+class TitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):

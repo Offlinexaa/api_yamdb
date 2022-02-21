@@ -4,11 +4,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 
-from .models import Category, Genre, User
+from .models import Category, Genre, User, Title
 from .permissions import AdminOnly
-from .mixins import (CreateByAdminOrReadOnlyModelMixin, PostByAny)
+from .mixins import (CreateByAdminOrReadOnlyModelMixin,
+                     CreateOrChangeByAdminOrReadOnlyModelMixin,
+                     PostByAny)
 from .serializers import (CategorySerializer, GenreSerializer,
-                          UserSerializer, ConfirmationSerializer)
+                          UserSerializer, ConfirmationSerializer,
+                          TitleSerializer)
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -21,6 +24,11 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     serializer_class = GenreSerializer
     search_fields = ('name',)
     queryset = Genre.objects.all()
+
+
+class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
