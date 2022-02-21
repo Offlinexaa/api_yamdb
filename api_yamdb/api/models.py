@@ -95,12 +95,12 @@ class Title(models.Model):
 
 class GenreTitle(models.Model):
     """Модель связи произведения с жанром."""
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='genre',
     )
-    genre_id = models.ForeignKey(
+    genre = models.ForeignKey(
         Genre,
         on_delete=models.CASCADE,
         related_name='title',
