@@ -52,23 +52,25 @@ class NewUserAPIView(PostByAny):
         if serializer.is_valid():
             if not User.objects.filter(
                 username=serializer.validated_data['username']
+            ).exists() and not User.objects.filter(
+                email=serializer.validated_data['email']
             ).exists():
                 serializer.save(role='user')
-            user = User.objects.get(
-                username=serializer.validated_data['username']
-            )
-            user.confirmation_code = str(RefreshToken.for_user(user))
-            user.save(update_fields=['confirmation_code'])
-            send_mail(
-                subject='Confirmation code.',
-                message=user.confirmation_code,
-                from_email='noreply@yamdb.local',
-                recipient_list=[user.email, ]
-            )
-            return Response(
-                serializer.validated_data,
-                status=status.HTTP_200_OK,
-            )
+                user = User.objects.get(
+                    username=serializer.validated_data['username']
+                )
+                user.confirmation_code = str(RefreshToken.for_user(user))
+                user.save(update_fields=['confirmation_code'])
+                send_mail(
+                    subject='Confirmation code.',
+                    message=user.confirmation_code,
+                    from_email='noreply@yamdb.local',
+                    recipient_list=[user.email, ]
+                )
+                return Response(
+                    serializer.validated_data,
+                    status=status.HTTP_200_OK,
+                )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
