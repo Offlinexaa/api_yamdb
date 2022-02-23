@@ -1,31 +1,27 @@
+"""Модуль управления путями для api."""
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
 
-from api.views import (CategoryViewSet, CommentViewSet, GenreViewSet,
-                       ReviewViewSet, TitleViewSet, UserViewSet,
-                       get_token_for_user, sign_up)
+from .views import (UserViewSet, NewUserAPIView, ConfirmAPIView,
+                    CategoryViewSet, GenreViewSet, TitleViewSet,
+                    UserSelfManagementAPIView)
 
-router = DefaultRouter()
 
-router.register(
-    r'titles/(?P<title_id>\d+)/reviews',
-    ReviewViewSet,
-    basename='reviews'
-)
-router.register('users', UserViewSet)
-router.register('genres', GenreViewSet)
-router.register('categories', CategoryViewSet)
-router.register('titles', TitleViewSet)
-router.register(
-    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-    CommentViewSet,
-    basename='comments'
-)
+app_name = 'api'
+
+v1_router = SimpleRouter()
+v1_router.register('users', UserViewSet)
+v1_router.register('categories', CategoryViewSet,
+                   basename='categories api endpoint')
+v1_router.register('genres', GenreViewSet,
+                   basename='genres api endpoint')
+v1_router.register('titles', TitleViewSet,
+                   basename='titles api endpoint')
 
 urlpatterns = [
-    # Все зарегистрированные в router пути доступны в router.urls
-    # Включим их в головной urls.py
-    path('v1/', include(router.urls)),
-    path('v1/auth/signup/', sign_up),
-    path('v1/auth/token/', get_token_for_user),
+    path('auth/signup/', NewUserAPIView.as_view(), name='new_user'),
+    path('auth/token/', ConfirmAPIView.as_view(), name='confirm_user'),
+    path('users/me/', UserSelfManagementAPIView.as_view(),
+         name='self_management'),
+    path('', include(v1_router.urls)),
 ]
