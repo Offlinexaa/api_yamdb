@@ -3,7 +3,8 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (UserViewSet, NewUserAPIView, ConfirmAPIView,
-                    CategoryViewSet, GenreViewSet, TitleViewSet)
+                    CategoryViewSet, GenreViewSet, TitleViewSet,
+                    UserSelfManagementAPIView)
 
 
 app_name = 'api'
@@ -20,5 +21,7 @@ v1_router.register('titles', TitleViewSet,
 urlpatterns = [
     path('auth/signup/', NewUserAPIView.as_view(), name='new_user'),
     path('auth/token/', ConfirmAPIView.as_view(), name='confirm_user'),
+    path('users/me/', UserSelfManagementAPIView.as_view(),
+         name='self_management'),
     path('', include(v1_router.urls)),
 ]
