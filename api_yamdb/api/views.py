@@ -1,6 +1,6 @@
 from django.core.mail import send_mail
 from rest_framework import viewsets, status
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 
@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AdminOnly, )
-    pagination_class = PageNumberPagination
+    pagination_class = LimitOffsetPagination
 
 
 class NewUserAPIView(PostByAny):
@@ -48,14 +48,29 @@ class NewUserAPIView(PostByAny):
     подтверждения.
     """
     def post(self, request, *args, **kwargs):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            if not User.objects.filter(
+        def _check_not_exist_partial():
+            """
+            Логика проверки частичного присутствия имени или адреса почты
+            в имеющихся пользователях.
+            """
+            if User.objects.filter(
+                username=serializer.validated_data['username'],
+                email=serializer.validated_data['email']
+            ).exists() or (not User.objects.filter(
                 username=serializer.validated_data['username']
             ).exists() and not User.objects.filter(
                 email=serializer.validated_data['email']
-            ).exists():
-                serializer.save(role='user')
+            ).exists()):
+                return True
+            return False
+
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            if _check_not_exist_partial():
+                if not User.objects.filter(
+                    username=serializer.validated_data['username']
+                ).exists():
+                    serializer.save(role='user')
                 user = User.objects.get(
                     username=serializer.validated_data['username']
                 )
