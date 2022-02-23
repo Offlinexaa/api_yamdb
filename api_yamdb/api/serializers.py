@@ -1,7 +1,7 @@
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
 
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Title, User, USER_ROLES
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -43,15 +43,16 @@ class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     bio = serializers.CharField(required=False)
-    role = serializers.CharField(required=False)
+    role = serializers.ChoiceField(choices=USER_ROLES, required=False)
 
-    def validate(self, data):
-        if data['username'] == 'me':
+    @staticmethod
+    def validate_username(username):
+        if username == 'me':
             raise serializers.ValidationError(
                 {'username':
                  'Нельзя использовать \'me\' как имя пользователя.'}
             )
-        return data
+        return username
 
     class Meta:
         model = User
