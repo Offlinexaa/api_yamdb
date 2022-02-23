@@ -3,6 +3,8 @@ from rest_framework import viewsets, status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Genre, User, Title
 from .permissions import AdminOnly
@@ -17,18 +19,42 @@ from .serializers import (CategorySerializer, GenreSerializer,
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = LimitOffsetPagination
     search_fields = ('name',)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
     search_fields = ('name',)
     queryset = Genre.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
+
+    def perform_create(self, request, *args, **kwargs):
+        title = get_object_or_404()
+        self.perform_create(title)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class UserViewSet(viewsets.ModelViewSet):
