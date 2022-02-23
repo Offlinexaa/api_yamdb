@@ -8,6 +8,11 @@ from .validators import validate_year
 
 MAX_SCORE = 'Максимальная оценка'
 MIN_SCORE = 'Минимальная оценка'
+USER_ROLES = (
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin')
+)
 
 
 class User(AbstractUser):
@@ -15,12 +20,6 @@ class User(AbstractUser):
     Модель пользователя.
     Добавлены поля 'Биография', 'Роль' и 'Код подтверждения'.
     """
-    USER_ROLES = [
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin')
-    ]
-
     bio = models.TextField(
         'Биография',
         blank=True,
