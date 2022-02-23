@@ -11,7 +11,7 @@ from .mixins import (CreateByAdminOrReadOnlyModelMixin,
                      PostByAny)
 from .serializers import (CategorySerializer, GenreSerializer,
                           UserSerializer, ConfirmationSerializer,
-                          TitleSerializer)
+                          TitleSerializer, UserCreateSerializer)
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -37,6 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (AdminOnly, )
     pagination_class = LimitOffsetPagination
+    lookup_field = 'username'
 
 
 class NewUserAPIView(PostByAny):
@@ -64,7 +65,7 @@ class NewUserAPIView(PostByAny):
                 return True
             return False
 
-        serializer = UserSerializer(data=request.data)
+        serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             if _check_not_exist_partial():
                 if not User.objects.filter(

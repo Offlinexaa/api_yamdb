@@ -57,6 +57,19 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
+        lookup_field = 'username'
+
+
+class UserCreateSerializer(UserSerializer):
+    username = serializers.RegexField(
+        r'^[\w.@+-]+\Z',
+        max_length=150,
+        required=True,
+    )
+    email = serializers.EmailField(
+        max_length=254,
+        required=True,
+    )
 
 
 class ConfirmationSerializer(serializers.ModelSerializer):
