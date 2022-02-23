@@ -1,50 +1,30 @@
-from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class AdminOrReadonly(permissions.BasePermission):
-    """Пермишен доступа на чтение для всех на изменение - администратор."""
-    def has_permission(self, request, view):
-        result = False
-        result = result or request.method in permissions.SAFE_METHODS
-        result = result or request.user.is_superuser
-        if request.user.is_authenticated:
-            result = result or request.user.role.lower() == 'admin'
-        return result
-
-    def has_object_permission(self, request, view, obj):
-        return self.has_permission()
-
-
-class AuthorModeratorAdminOrReadonly(permissions.BasePermission):
-    """
-    Пермишен доступа на чтение для всех на изменение:
-    автор, модератор или администратор.
-    """
+class UserIsModerator(BasePermission):
     def has_permission(self, request, view):
         return (
-            request.method in permissions.SAFE_METHODS
+            request.method in SAFE_METHODS
             or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
-        result = False
-        result = result or request.method in permissions.SAFE_METHODS
-        result = result or request.user == obj.author
-        result = result or request.user.is_superuser
-        if request.user.is_authenticated:
-            result = result or request.user.role.lower() == 'moderator'
-            result = result or request.user.role.lower() == 'admin'
-        return result
+        return (
+            request.user == obj.author
+            or request.user.is_moderator
+            or request.user.is_admin
+        )
 
 
-class AdminOnly(permissions.BasePermission):
-    """Пермишен доступа только для админа."""
+class UserIsAdmin(BasePermission):
     def has_permission(self, request, view):
-        result = False
-        result = result or request.user.is_superuser
-        if request.user.is_authenticated:
-            result = result or request.user.role.lower() == 'admin'
-        return result
+        return request.user.is_authenticated and request.user.is_admin
 
-    def has_object_permission(self, request, view, obj):
-        return self.has_permission(request, view)
+
+class UserIsAdminOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.method in SAFE_METHODS
+            or request.user.is_staff
+            or (request.user.is_authenticated and request.user.is_admin)
+        )
