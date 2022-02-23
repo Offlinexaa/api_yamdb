@@ -22,24 +22,19 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели User"""
+class UserCreateUpdateSerializer(serializers.ModelSerializer):
     username = serializers.RegexField(
         r'^[\w.@+-]+\Z',
         max_length=150,
         required=True,
-        validators=[validators.UniqueValidator(
-            queryset=User.objects.all(),
-            message='Пользователь с таким именем уже существует.')])
+    )
     email = serializers.EmailField(
         max_length=254,
         required=True,
-        validators=[validators.UniqueValidator(
-            queryset=User.objects.all(),
-            message='Пользователь с таким адресом почты уже существует.')])
+    )
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     bio = serializers.CharField(required=False)
@@ -56,21 +51,31 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name',
-                  'last_name', 'bio', 'role')
-        lookup_field = 'username'
+        fields = ('username', 'email', 'first_name', 'last_name', 'bio',
+                  'role')
 
 
-class UserCreateSerializer(UserSerializer):
+class UserSerializer(UserCreateUpdateSerializer):
+    """Сериализатор для модели User"""
     username = serializers.RegexField(
         r'^[\w.@+-]+\Z',
         max_length=150,
         required=True,
-    )
+        validators=[validators.UniqueValidator(
+            queryset=User.objects.all(),
+            message='Пользователь с таким именем уже существует.')])
     email = serializers.EmailField(
         max_length=254,
         required=True,
-    )
+        validators=[validators.UniqueValidator(
+            queryset=User.objects.all(),
+            message='Пользователь с таким адресом почты уже существует.')])
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        lookup_field = 'username'
 
 
 class ConfirmationSerializer(serializers.ModelSerializer):

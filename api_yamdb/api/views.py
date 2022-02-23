@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
+from rest_framework.generics import RetrieveUpdateAPIView
 
 from reviews.models import Category, Genre, User, Title
 from .permissions import AdminOnly
@@ -11,7 +12,7 @@ from .mixins import (CreateByAdminOrReadOnlyModelMixin,
                      PostByAny)
 from .serializers import (CategorySerializer, GenreSerializer,
                           UserSerializer, ConfirmationSerializer,
-                          TitleSerializer, UserCreateSerializer)
+                          TitleSerializer, UserCreateUpdateSerializer)
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -65,7 +66,7 @@ class NewUserAPIView(PostByAny):
                 return True
             return False
 
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = UserCreateUpdateSerializer(data=request.data)
         if serializer.is_valid():
             if _check_not_exist_partial():
                 if not User.objects.filter(
@@ -107,4 +108,28 @@ class ConfirmAPIView(PostByAny):
                  str(RefreshToken.for_user(user).access_token)},
                 status=status.HTTP_200_OK
             )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserSelfManagementAPIView(RetrieveUpdateAPIView):
+    """
+    Класс управления собственным пользователем.
+    """
+    def retrieve(self, request, *args, **kwargs):
+        serializer = UserCreateUpdateSerializer(instance=request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        serializer = UserCreateUpdateSerializer(request.user,
+                                                data=request.data,
+                                                partial=True)
+        if serializer.is_valid():
+            if (
+                'role' in serializer.validated_data
+                and request.user.role != 'admin'
+            ):
+                serializer.validated_data['role'] = request.user.role
+            serializer.save()
+            return Response(serializer.validated_data,
+                            status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
