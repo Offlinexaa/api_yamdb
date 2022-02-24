@@ -1,5 +1,5 @@
 from django.core.mail import send_mail
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -24,14 +24,17 @@ class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
     lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)
 
 
 class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
-    queryset = Genre.objects.all()
     lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)
+
 
 
 class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
