@@ -4,7 +4,6 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveUpdateAPIView
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Genre, User, Title, Review
@@ -24,6 +23,7 @@ class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -31,14 +31,7 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
     queryset = Genre.objects.all()
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-        except Http404:
-            pass
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
