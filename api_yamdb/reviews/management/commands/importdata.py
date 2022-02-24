@@ -1,12 +1,11 @@
 import csv
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 from django.core.management.base import BaseCommand
 
-# Заменить api_v1 на имя приложения
-from reviews.models import (Genre, Category, Title, GenreTitle, Review,
-                            Comment, User)
+from reviews.models import (Category, Comment, Genre, GenreTitle, Review,
+                            Title, User)
 
 
 def _get_file_reader(filename):

@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import (Category, Comment, Genre, GenreTitle, Review,
-                     Title, User)
+from .models import Category, Comment, Genre, GenreTitle, Review, Title, User
 
 
 @admin.register(Category)
@@ -58,4 +57,6 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ('username', 'role')
+    list_display = ('username', 'email', 'role', )
+    list_editable = ('role', )
+    search_fields = ('username', 'role', )
