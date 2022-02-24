@@ -1,12 +1,11 @@
 from django.core.mail import send_mail
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveUpdateAPIView
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import Category, Genre, User, Title, Review
 from .permissions import (AdminOnly, AdminOrReadonly,
@@ -25,8 +24,7 @@ class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name')
+    filter_backends = (filters.SearchFilter,)
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -42,8 +40,7 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
     queryset = Genre.objects.all()
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name')
+    filter_backends = (filters.SearchFilter,)
 
     def destroy(self, request, *args, **kwargs):
         try:
