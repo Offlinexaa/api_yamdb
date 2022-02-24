@@ -1,10 +1,10 @@
+"""Модуль содержит описание моделей."""
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from .validators import validate_year
 
-# from .validators import validate_year
 
 MAX_SCORE = 'Максимальная оценка'
 MIN_SCORE = 'Минимальная оценка'
@@ -41,6 +41,9 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
         ordering = ('username',)
 
+    def __str__(self):
+        return str(self.username)
+
 
 class Genre(models.Model):
     """Модель жанров."""
@@ -52,7 +55,7 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Category(models.Model):
@@ -65,7 +68,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Title(models.Model):
@@ -91,7 +94,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class GenreTitle(models.Model):
@@ -107,6 +110,7 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
+    """Модель отзывов."""
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True
@@ -135,10 +139,11 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text
+        return str(self.text)
 
 
 class Comment(models.Model):
+    """Модель комментариев."""
     text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments',
@@ -157,4 +162,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return str(self.text)

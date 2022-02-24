@@ -2,22 +2,17 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from .views import (UserViewSet, NewUserAPIView, ConfirmAPIView,
-                    CategoryViewSet, GenreViewSet, TitleViewSet,
-                    UserSelfManagementAPIView, ReviewViewSet,
-                    CommentViewSet)
-
+from .views import (CategoryViewSet, CommentViewSet, ConfirmAPIView,
+                    GenreViewSet, NewUserAPIView, ReviewViewSet, TitleViewSet,
+                    UserSelfManagementAPIView, UserViewSet)
 
 app_name = 'api'
 
 v1_router = SimpleRouter()
 v1_router.register('users', UserViewSet)
-v1_router.register('categories', CategoryViewSet,
-                   basename='categories api endpoint')
-v1_router.register('genres', GenreViewSet,
-                   basename='genres api endpoint')
-v1_router.register('titles', TitleViewSet,
-                   basename='titles api endpoint')
+v1_router.register('categories', CategoryViewSet)
+v1_router.register('genres', GenreViewSet)
+v1_router.register('titles', TitleViewSet)
 v1_router.register(
     r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,

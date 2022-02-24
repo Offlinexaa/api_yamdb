@@ -1,3 +1,4 @@
+"""Модуль содержит самописные пермишены."""
 from rest_framework import permissions
 
 
