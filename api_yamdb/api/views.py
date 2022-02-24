@@ -1,5 +1,5 @@
 from django.core.mail import send_mail
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status, filters, permissions
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -15,7 +15,9 @@ from .mixins import (CreateByAdminOrReadOnlyModelMixin,
 from .serializers import (CategorySerializer, GenreSerializer,
                           UserSerializer, ConfirmationSerializer,
                           TitleSerializer, UserCreateUpdateSerializer,
-                          ReviewSerializer, CommentSerializer)
+                          ReviewSerializer, CommentSerializer,
+                          ReadTitleSerializer)
+from .filters import TitleFilter
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -36,11 +38,16 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     filter_backends = (filters.SearchFilter,)
 
 
-
 class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return ReadTitleSerializer
+        return TitleSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
