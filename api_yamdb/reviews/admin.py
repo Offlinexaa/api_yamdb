@@ -1,3 +1,4 @@
+"""Модуль содержит настройки web-интерфейса администратора."""
 from django.contrib import admin
 
 from .models import Category, Comment, Genre, GenreTitle, Review, Title, User
@@ -17,7 +18,6 @@ class GenreAdmin(admin.ModelAdmin):
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    pass
     list_display = ('name', 'year', 'category')
     search_fields = ('name', 'category__name', 'description')
     list_filter = ('year', 'category')

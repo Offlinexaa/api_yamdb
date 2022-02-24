@@ -1,3 +1,4 @@
+"""Модуль содержит самописные валидаторы для использования в моделях."""
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 

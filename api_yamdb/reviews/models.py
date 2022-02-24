@@ -1,3 +1,4 @@
+"""Модуль содержит описание моделей."""
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -41,7 +42,7 @@ class User(AbstractUser):
         ordering = ('username',)
 
     def __str__(self):
-        return self.username
+        return str(self.username)
 
 
 class Genre(models.Model):
@@ -54,7 +55,7 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Category(models.Model):
@@ -67,7 +68,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Title(models.Model):
@@ -93,7 +94,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class GenreTitle(models.Model):
@@ -138,7 +139,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text
+        return str(self.text)
 
 
 class Comment(models.Model):
@@ -161,4 +162,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return str(self.text)
