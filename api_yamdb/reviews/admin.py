@@ -31,16 +31,29 @@ class GenreTitleAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('author', 'score', 'title')
-    search_fields = ('text', 'title__name')
-    list_filter = ('author', 'score', )
+    list_display = (
+        'id',
+        'title',
+        'text',
+        'author',
+        'score',
+        'pub_date'
+    )
+    list_editable = ('text',)
+    search_fields = ('title', 'text',)
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('author', 'review', )
-    list_filter = ('author', )
-    search_fields = ('review__text', 'text')
+    list_display = (
+        'id',
+        'review',
+        'text',
+        'author',
+        'pub_date'
+    )
+    list_editable = ('text',)
+    search_fields = ('review', 'text',)
 
 
 @admin.register(User)
