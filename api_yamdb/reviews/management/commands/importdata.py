@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 
 # Заменить api_v1 на имя приложения
 from reviews.models import (Genre, Category, Title, GenreTitle, Review,
-                        Comment, User)
+                            Comment, User)
 
 
 def _get_file_reader(filename):
@@ -58,7 +58,7 @@ def _load_titles():
         _, created = Title.objects.get_or_create(
             pk=int(line[0]),
             name=line[1],
-            year=datetime.strptime(line[2], "%Y").date(),
+            year=int(line[2]),
             category=Category.objects.get(pk=int(line[3]))
         )
 

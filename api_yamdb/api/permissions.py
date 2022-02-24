@@ -12,7 +12,7 @@ class AdminOrReadonly(permissions.BasePermission):
         return result
 
     def has_object_permission(self, request, view, obj):
-        return self.has_permission()
+        return self.has_permission(request, view)
 
 
 class AuthorModeratorAdminOrReadonly(permissions.BasePermission):
