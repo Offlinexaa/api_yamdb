@@ -1,27 +1,28 @@
+"""Модуль содержит вьюсеты и вью-классы."""
 from django.core.mail import send_mail
 from django.db.models import Avg
-from rest_framework import viewsets, status, filters, permissions
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.response import Response
-from rest_framework.generics import RetrieveUpdateAPIView
 from django.shortcuts import get_object_or_404
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from reviews.models import Category, Genre, User, Title, Review
+from reviews.models import Category, Genre, Review, Title, User
+from .filters import TitleFilter
+from .mixins import (CreateByAdminOrReadOnlyModelMixin,
+                     CreateOrChangeByAdminOrReadOnlyModelMixin, PostByAny)
 from .permissions import (AdminOnly, AdminOrReadonly,
                           AuthorModeratorAdminOrReadonly)
-from .mixins import (CreateByAdminOrReadOnlyModelMixin,
-                     CreateOrChangeByAdminOrReadOnlyModelMixin,
-                     PostByAny)
-from .serializers import (CategorySerializer, GenreSerializer,
-                          UserSerializer, ConfirmationSerializer,
+from .serializers import (CategorySerializer, CommentSerializer,
+                          ConfirmationSerializer, GenreSerializer,
+                          ReadTitleSerializer, ReviewSerializer,
                           TitleSerializer, UserCreateUpdateSerializer,
-                          ReviewSerializer, CommentSerializer,
-                          ReadTitleSerializer)
-from .filters import TitleFilter
+                          UserSerializer)
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
+    """Вьюсет для модели Category."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
@@ -31,6 +32,7 @@ class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
 
 
 class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
+    """Вьюсет для модели Genre."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = LimitOffsetPagination
@@ -40,6 +42,12 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
 
 
 class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
+    """
+    Вьюсет для модели Title.
+    Для метода GET применяется сериализатор ReadTitleSerializer.
+    Для других методов применяется сериализатор TitleSerializer.
+    Добавляется динамическое поле, содержащее агрегирующую функцию.
+    """
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
@@ -52,7 +60,11 @@ class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """Вьюсет для модели User. Доступен только администраторам."""
+    """
+    Вьюсет для модели User.
+    Доступен только администраторам.
+    Получение экземпляра модели User по полю username.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AdminOnly, )
@@ -133,6 +145,8 @@ class ConfirmAPIView(PostByAny):
 class UserSelfManagementAPIView(RetrieveUpdateAPIView):
     """
     Класс управления собственным пользователем.
+    При попытке изменения роли кем-либо, кроме администратора,
+    в базу передаётся текущая роль пользователя.
     """
     def retrieve(self, request, *args, **kwargs):
         serializer = UserCreateUpdateSerializer(instance=request.user)
@@ -155,6 +169,7 @@ class UserSelfManagementAPIView(RetrieveUpdateAPIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Вьюсет для модели Review."""
     serializer_class = ReviewSerializer
     permission_classes = (AuthorModeratorAdminOrReadonly,)
     pagination_class = LimitOffsetPagination
@@ -168,12 +183,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=title)
 
     def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ('list', 'retrieve'):
             return (AdminOrReadonly(),)
         return super().get_permissions()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для модели Comment."""
     serializer_class = CommentSerializer
     permission_classes = (AuthorModeratorAdminOrReadonly,)
     pagination_class = LimitOffsetPagination
@@ -191,6 +207,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
     def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ('list', 'retrieve'):
             return (AdminOrReadonly(),)
         return super().get_permissions()
