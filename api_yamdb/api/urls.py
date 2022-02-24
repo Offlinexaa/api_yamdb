@@ -4,7 +4,8 @@ from rest_framework.routers import SimpleRouter
 
 from .views import (UserViewSet, NewUserAPIView, ConfirmAPIView,
                     CategoryViewSet, GenreViewSet, TitleViewSet,
-                    UserSelfManagementAPIView)
+                    UserSelfManagementAPIView, ReviewViewSet,
+                    CommentViewSet)
 
 
 app_name = 'api'
@@ -17,6 +18,16 @@ v1_router.register('genres', GenreViewSet,
                    basename='genres api endpoint')
 v1_router.register('titles', TitleViewSet,
                    basename='titles api endpoint')
+v1_router.register(
+    r'titles/(?P<title_id>\d+)/reviews',
+    ReviewViewSet,
+    basename='reviews'
+)
+v1_router.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    CommentViewSet,
+    basename='comments'
+)
 
 urlpatterns = [
     path('auth/signup/', NewUserAPIView.as_view(), name='new_user'),

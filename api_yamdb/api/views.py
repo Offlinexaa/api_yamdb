@@ -7,14 +7,16 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
-from reviews.models import Category, Genre, User, Title
-from .permissions import AdminOnly
+from reviews.models import Category, Genre, User, Title, Review
+from .permissions import (AdminOnly, AdminOrReadonly,
+                          AuthorModeratorAdminOrReadonly)
 from .mixins import (CreateByAdminOrReadOnlyModelMixin,
                      CreateOrChangeByAdminOrReadOnlyModelMixin,
                      PostByAny)
 from .serializers import (CategorySerializer, GenreSerializer,
                           UserSerializer, ConfirmationSerializer,
-                          TitleSerializer, UserCreateUpdateSerializer)
+                          TitleSerializer, UserCreateUpdateSerializer,
+                          ReviewSerializer, CommentSerializer)
 
 
 class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
@@ -159,3 +161,43 @@ class UserSelfManagementAPIView(RetrieveUpdateAPIView):
             return Response(serializer.validated_data,
                             status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (AuthorModeratorAdminOrReadonly,)
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
+
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return (AdminOrReadonly(),)
+        return super().get_permissions()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (AuthorModeratorAdminOrReadonly,)
+
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        title_id = self.kwargs.get('title_id')
+        review = get_object_or_404(Review, pk=review_id, title__id=title_id)
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        title_id = self.kwargs.get('title_id')
+        review = get_object_or_404(Review, pk=review_id, title__id=title_id)
+        serializer.save(author=self.request.user, review=review)
+
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return (AdminOrReadonly(),)
+        return super().get_permissions()
