@@ -45,6 +45,18 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'description', 'category', 'genre')
 
 
+class ReadTitleSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    rating = serializers.IntegerField(read_only=True)
+    year = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
     username = serializers.RegexField(
         r'^[\w.@+-]+\Z',

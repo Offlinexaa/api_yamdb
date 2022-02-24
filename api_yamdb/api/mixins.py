@@ -15,6 +15,7 @@ class CreateOrChangeByAdminOrReadOnlyModelMixin(mixins.CreateModelMixin,
                                                 mixins.ListModelMixin,
                                                 mixins.DestroyModelMixin,
                                                 mixins.UpdateModelMixin,
+                                                mixins.RetrieveModelMixin,
                                                 viewsets.GenericViewSet):
     permission_classes = (AdminOrReadonly, )
 
