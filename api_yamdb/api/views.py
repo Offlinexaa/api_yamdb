@@ -1,4 +1,5 @@
 from django.core.mail import send_mail
+from django.db.models import Avg
 from rest_framework import viewsets, status, filters, permissions
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -39,7 +40,7 @@ class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
 
 
 class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
     filterset_class = TitleFilter
