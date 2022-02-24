@@ -1,3 +1,4 @@
+from datetime import date
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
 
@@ -9,17 +10,35 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'slug', 'name')
+        fields = ('slug', 'name')
+        lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('id', 'name', 'slug')
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all(),
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Genre.objects.all(), many=True
+    )
+    description = serializers.CharField(required=False)
+
+    def validate_year(self, value):
+        year = date.today().year
+        if value <= 0 or value > year:
+            raise serializers.ValidationError(
+                'Год указан некорректно.'
+            )
+        return value
 
     class Meta:
         model = Title

@@ -72,9 +72,10 @@ class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(max_length=255,
                             verbose_name='Название произведения')
-    year = models.DateField(verbose_name='Год выпуска',
-                            validators=[validate_year])
-    description = models.TextField(max_length=255, verbose_name='Описание')
+    year = models.IntegerField(verbose_name='Год выпуска',
+                               validators=[validate_year])
+    description = models.TextField(max_length=255, verbose_name='Описание',
+                                   blank=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
@@ -82,7 +83,8 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(Genre,
                                    through='GenreTitle',
-                                   verbose_name='Жанр')
+                                   verbose_name='Жанр',
+                                   related_name='titles')
 
     class Meta:
         verbose_name = 'Произведение'

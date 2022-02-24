@@ -54,11 +54,6 @@ class TitleViewSet(CreateOrChangeByAdminOrReadOnlyModelMixin):
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
 
-    def perform_create(self, request, *args, **kwargs):
-        title = get_object_or_404()
-        self.perform_create(title)
-        return Response(status=status.HTTP_201_CREATED)
-
 
 class UserViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели User. Доступен только администраторам."""
