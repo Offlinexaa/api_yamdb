@@ -25,14 +25,6 @@ class CategoryViewSet(CreateByAdminOrReadOnlyModelMixin):
     pagination_class = LimitOffsetPagination
     search_fields = ('name',)
 
-    def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-        except Http404:
-            pass
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class GenreViewSet(CreateByAdminOrReadOnlyModelMixin):
     serializer_class = GenreSerializer
