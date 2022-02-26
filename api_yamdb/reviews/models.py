@@ -33,7 +33,8 @@ class User(AbstractUser):
         'Роль',
         max_length=255,
         choices=USER_ROLES,
-        default=USER
+        default=USER,
+        db_index=True
     )
     confirmation_code = models.TextField(
         'Код подтверждения',
@@ -89,7 +90,7 @@ class Category(models.Model):
 class Title(models.Model):
     """Модель произведений."""
     name = models.TextField(verbose_name='Название произведения')
-    year = models.IntegerField(verbose_name='Год выпуска',
+    year = models.IntegerField(verbose_name='Год выпуска', db_index=True,
                                validators=(validate_year, ))
     description = models.TextField(verbose_name='Описание', blank=True)
     category = models.ForeignKey(
