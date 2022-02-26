@@ -3,10 +3,11 @@ from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, status, viewsets
-from rest_framework.generics import RetrieveUpdateAPIView
+# from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import action
 
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
@@ -70,6 +71,34 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOnly, )
     pagination_class = LimitOffsetPagination
     lookup_field = 'username'
+
+    @action(
+        methods=['get', 'patch'],
+        detail=False,
+        permission_classes=[permissions.IsAuthenticated, ]
+    )
+    def me(self, request):
+        """
+        Функция управления собственным пользователем.
+        При попытке изменения роли кем-либо, кроме администратора,
+        в базу передаётся текущая роль пользователя.
+        """
+        if request.method.lower() == 'get':
+            serializer = UserCreateUpdateSerializer(instance=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserCreateUpdateSerializer(request.user,
+                                                data=request.data,
+                                                partial=True)
+        if serializer.is_valid():
+            if (
+                'role' in serializer.validated_data
+                and not request.user.is_admin
+            ):
+                serializer.validated_data['role'] = request.user.role
+            serializer.save()
+            return Response(serializer.validated_data,
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NewUserAPIView(PostByAny):
@@ -139,32 +168,6 @@ class ConfirmAPIView(PostByAny):
                  str(RefreshToken.for_user(user).access_token)},
                 status=status.HTTP_200_OK
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserSelfManagementAPIView(RetrieveUpdateAPIView):
-    """
-    Класс управления собственным пользователем.
-    При попытке изменения роли кем-либо, кроме администратора,
-    в базу передаётся текущая роль пользователя.
-    """
-    def retrieve(self, request, *args, **kwargs):
-        serializer = UserCreateUpdateSerializer(instance=request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def update(self, request, *args, **kwargs):
-        serializer = UserCreateUpdateSerializer(request.user,
-                                                data=request.data,
-                                                partial=True)
-        if serializer.is_valid():
-            if (
-                'role' in serializer.validated_data
-                and not request.user.is_admin
-            ):
-                serializer.validated_data['role'] = request.user.role
-            serializer.save()
-            return Response(serializer.validated_data,
-                            status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

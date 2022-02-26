@@ -4,7 +4,7 @@ from rest_framework.routers import SimpleRouter
 
 from .views import (CategoryViewSet, CommentViewSet, ConfirmAPIView,
                     GenreViewSet, NewUserAPIView, ReviewViewSet, TitleViewSet,
-                    UserSelfManagementAPIView, UserViewSet)
+                    UserViewSet)
 
 app_name = 'api'
 
@@ -27,7 +27,5 @@ v1_router.register(
 urlpatterns = [
     path('v1/auth/signup/', NewUserAPIView.as_view(), name='new_user'),
     path('v1/auth/token/', ConfirmAPIView.as_view(), name='confirm_user'),
-    path('v1/users/me/', UserSelfManagementAPIView.as_view(),
-         name='self_management'),
     path('v1/', include(v1_router.urls)),
 ]
