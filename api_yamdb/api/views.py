@@ -1,5 +1,5 @@
 """Модуль содержит вьюсеты и вью-классы."""
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, status, viewsets
@@ -109,12 +109,12 @@ class NewUserAPIView(PostByAny):
                 )
                 user.confirmation_code = str(RefreshToken.for_user(user))
                 user.save(update_fields=['confirmation_code'])
-                send_mail(
+                mail = EmailMessage(
                     subject='Confirmation code.',
-                    message=user.confirmation_code,
-                    from_email='noreply@yamdb.local',
-                    recipient_list=[user.email, ]
+                    body=user.confirmation_code,
+                    to=[user.email, ]
                 )
+                mail.send(fail_silently=True)
                 return Response(
                     serializer.validated_data,
                     status=status.HTTP_200_OK,
@@ -159,7 +159,7 @@ class UserSelfManagementAPIView(RetrieveUpdateAPIView):
         if serializer.is_valid():
             if (
                 'role' in serializer.validated_data
-                and request.user.role != 'admin'
+                and not request.user.is_admin
             ):
                 serializer.validated_data['role'] = request.user.role
             serializer.save()
