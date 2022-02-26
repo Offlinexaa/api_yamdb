@@ -88,7 +88,7 @@ class Title(models.Model):
     """Модель произведений."""
     name = models.TextField(verbose_name='Название произведения')
     year = models.IntegerField(verbose_name='Год выпуска',
-                               validators=[validate_year])
+                               validators=(validate_year, ))
     description = models.TextField(verbose_name='Описание', blank=True)
     category = models.ForeignKey(
         Category,
@@ -130,10 +130,10 @@ class Review(models.Model):
         User, on_delete=models.CASCADE, related_name='reviews',
         verbose_name='автор'
     )
-    score = models.IntegerField('оценка', validators=[
+    score = models.IntegerField('оценка', validators=(
                                 MinValueValidator(1, 'Минимальная оценка-1'),
                                 MaxValueValidator(10, 'Максимальная оценка-10')
-                                ])
+                                ))
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='reviews',
@@ -143,11 +143,11 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
                 fields=['title', 'author'],
-                name='unique_riview')
-        ]
+                name='unique_riview'),
+        )
 
     def __str__(self):
         return str(self.text)
