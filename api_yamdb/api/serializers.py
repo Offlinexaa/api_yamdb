@@ -1,5 +1,5 @@
 """Модуль содержит сериализаторы, используемые в REST API."""
-from datetime import date
+from django.utils.timezone import datetime
 
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
@@ -15,7 +15,7 @@ class CategorySerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Category
-        fields = ('slug', 'name')
+        exclude = ('id', )
         lookup_field = 'slug'
 
 
@@ -26,7 +26,7 @@ class GenreSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Genre
-        fields = ('name', 'slug')
+        exclude = ('id', )
         lookup_field = 'slug'
 
 
@@ -45,7 +45,7 @@ class TitleSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
 
     def validate_year(self, value):
-        year = date.today().year
+        year = datetime.today().year
         if value <= 0 or value > year:
             raise serializers.ValidationError(
                 'Год указан некорректно.'
@@ -166,11 +166,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     """
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
-    title = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    score = serializers.IntegerField(
-        min_value=1,
-        max_value=10,
-    )
 
     def validate(self, attrs):
         request = self.context['request']
@@ -189,7 +184,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('id', 'text', 'pub_date', 'author', 'score', 'title')
-        read_only_fields = ('id', )
+        read_only_fields = ('id', 'title')
         model = Review
 
 
