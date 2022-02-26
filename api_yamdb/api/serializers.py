@@ -4,7 +4,7 @@ from datetime import date
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
 
-from reviews.models import (USER_ROLES, Category, Comment, Genre, Review,
+from reviews.models import (Category, Comment, Genre, Review,
                             Title, User)
 
 
@@ -93,7 +93,7 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     bio = serializers.CharField(required=False)
-    role = serializers.ChoiceField(choices=USER_ROLES, required=False)
+    role = serializers.ChoiceField(choices=User.USER_ROLES, required=False)
 
     @staticmethod
     def validate_username(username):

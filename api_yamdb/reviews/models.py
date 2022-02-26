@@ -8,11 +8,6 @@ from .validators import validate_year
 
 MAX_SCORE = 'Максимальная оценка'
 MIN_SCORE = 'Минимальная оценка'
-USER_ROLES = (
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin')
-)
 
 
 class User(AbstractUser):
@@ -20,6 +15,16 @@ class User(AbstractUser):
     Модель пользователя.
     Добавлены поля 'Биография', 'Роль' и 'Код подтверждения'.
     """
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+    USER_ROLES = (
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin')
+    )
+
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -28,7 +33,7 @@ class User(AbstractUser):
         'Роль',
         max_length=255,
         choices=USER_ROLES,
-        default='user'
+        default=USER
     )
     confirmation_code = models.TextField(
         'Код подтверждения',
@@ -40,6 +45,14 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ('username',)
+
+    @property
+    def is_moderator(self):
+        return self.role == User.MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.role == User.ADMIN or self.is_superuser
 
     def __str__(self):
         return str(self.username)
