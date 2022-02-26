@@ -66,6 +66,7 @@ class Genre(models.Model):
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
+        ordering = ('name', )
 
     def __str__(self):
         return str(self.name)
@@ -79,6 +80,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ('name', )
 
     def __str__(self):
         return str(self.name)
@@ -103,6 +105,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+        ordering = ['category', 'name', '-year']
 
     def __str__(self):
         return str(self.name)
@@ -148,6 +151,7 @@ class Review(models.Model):
                 fields=['title', 'author'],
                 name='unique_riview'),
         )
+        ordering = ['title', '-pub_date', '-score', 'text']
 
     def __str__(self):
         return str(self.text)
@@ -171,6 +175,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        ordering = ['review', '-pub_date', 'text']
 
     def __str__(self):
         return str(self.text)
