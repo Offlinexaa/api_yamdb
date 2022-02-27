@@ -143,10 +143,13 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='автор'
     )
-    score = models.IntegerField('оценка', validators=(
-                                MinValueValidator(1, 'Минимальная оценка-1'),
-                                MaxValueValidator(10, 'Максимальная оценка-10')
-                                ))
+    score = models.IntegerField(
+        'оценка',
+        validators=(
+            MinValueValidator(1, 'Минимальная оценка-1'),
+            MaxValueValidator(10, 'Максимальная оценка-10')
+        )
+    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,

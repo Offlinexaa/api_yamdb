@@ -3,11 +3,10 @@ from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, status, viewsets
-# from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import action
 
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
@@ -18,7 +17,7 @@ from .permissions import (AdminOnly, AdminOrReadonly,
 from .serializers import (CategorySerializer, CommentSerializer,
                           ConfirmationSerializer, GenreSerializer,
                           ReadTitleSerializer, ReviewSerializer,
-                          TitleSerializer, UserCreateUpdateSerializer,
+                          TitleSerializer, UserCreateSerializer,
                           UserSerializer)
 
 
@@ -84,11 +83,11 @@ class UserViewSet(viewsets.ModelViewSet):
         в базу передаётся текущая роль пользователя.
         """
         if request.method.lower() == 'get':
-            serializer = UserCreateUpdateSerializer(instance=request.user)
+            serializer = UserSerializer(instance=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = UserCreateUpdateSerializer(request.user,
-                                                data=request.data,
-                                                partial=True)
+        serializer = UserSerializer(request.user,
+                                    data=request.data,
+                                    partial=True)
         if serializer.is_valid():
             if (
                 'role' in serializer.validated_data
@@ -110,44 +109,27 @@ class NewUserAPIView(PostByAny):
     подтверждения.
     """
     def post(self, request, *args, **kwargs):
-        def _check_not_exist_partial():
-            """
-            Логика проверки частичного присутствия имени или адреса почты
-            в имеющихся пользователях.
-            """
-            if User.objects.filter(
-                username=serializer.validated_data['username'],
-                email=serializer.validated_data['email']
-            ).exists() or (not User.objects.filter(
-                username=serializer.validated_data['username']
-            ).exists() and not User.objects.filter(
-                email=serializer.validated_data['email']
-            ).exists()):
-                return True
-            return False
-
-        serializer = UserCreateUpdateSerializer(data=request.data)
+        serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            if _check_not_exist_partial():
-                if not User.objects.filter(
-                    username=serializer.validated_data['username']
-                ).exists():
-                    serializer.save(role='user')
-                user = User.objects.get(
-                    username=serializer.validated_data['username']
-                )
-                user.confirmation_code = str(RefreshToken.for_user(user))
-                user.save(update_fields=['confirmation_code'])
-                mail = EmailMessage(
-                    subject='Confirmation code.',
-                    body=user.confirmation_code,
-                    to=[user.email, ]
-                )
-                mail.send(fail_silently=True)
-                return Response(
-                    serializer.validated_data,
-                    status=status.HTTP_200_OK,
-                )
+            if not User.objects.filter(
+                username=serializer.validated_data['username']
+            ).exists():
+                serializer.save(role='user')
+            user = User.objects.get(
+                username=serializer.validated_data['username']
+            )
+            user.confirmation_code = str(RefreshToken.for_user(user))
+            user.save(update_fields=['confirmation_code'])
+            mail = EmailMessage(
+                subject='Confirmation code.',
+                body=user.confirmation_code,
+                to=[user.email, ]
+            )
+            mail.send(fail_silently=True)
+            return Response(
+                serializer.validated_data,
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
