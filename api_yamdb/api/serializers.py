@@ -82,6 +82,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     """
     username = serializers.RegexField(
         r'^[\w.@+-]+\Z',
+        max_length=150,
         required=True,
     )
     email = serializers.EmailField(
