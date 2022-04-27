@@ -57,6 +57,9 @@ http://127.0.0.1:8000/redoc/
 ```
 
 ### Требования:
+
 Python 3.7 или выше
+
 Django framework 2.2.16
+
 Django Rest framework 3.12.4
