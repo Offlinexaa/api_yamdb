@@ -64,6 +64,14 @@ Django framework 2.2.16
 
 Django Rest framework 3.12.4
 
+requests 2.26.0
+
+PyJWT 2.1.0
+
+Django Rest framework simplejwt
+
+django_filter
+
 ### Над проектом работали:
 
 Александр Харин (Offlinexaa) - реализация моделей, логики и api: токены, авторизация и пользователи 
